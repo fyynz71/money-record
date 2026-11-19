@@ -36,7 +36,13 @@
         <input type="month" id="monthPick" tabindex="-1" aria-hidden="true">
         <button id="next" aria-label="Bulan berikutnya">›</button>
       </nav>
-      <button class="primary" id="addBtn">Catat transaksi</button>
+      <p id="voiceHint" class="voice-hint" role="status" hidden></p>
+      <div class="actions">
+        <button class="primary" id="addBtn">Catat transaksi</button>
+        <button class="mic" id="micBtn" aria-label="Catat dengan suara" hidden>
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15Zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.6a6 6 0 0 0 5-5.9Z"/></svg>
+        </button>
+      </div>
     </div>
   </main>
 
@@ -47,6 +53,8 @@
       <h1 id="formTitle">Catat transaksi</h1>
       <span class="spacer"></span>
     </header>
+
+    <p id="heard" class="heard" hidden></p>
 
     <div class="seg" role="radiogroup">
       <label><input type="radio" name="type" value="out" checked><span>Pengeluaran</span></label>
@@ -59,8 +67,8 @@
     </label>
 
     <fieldset id="outCats" class="options">
-      <legend class="muted">Termasuk kebutuhan apa?</legend>
-      <label class="opt primer"><input type="radio" name="tier" value="primer" checked><i></i><span><b>Primer</b><small>Wajib dan rutin tiap bulan: kos, listrik, makan</small></span></label>
+      <legend class="muted">Termasuk kebutuhan apa? (opsional)</legend>
+      <label class="opt primer"><input type="radio" name="tier" value="primer"><i></i><span><b>Primer</b><small>Wajib dan rutin tiap bulan: kos, listrik, makan</small></span></label>
       <label class="opt sekunder"><input type="radio" name="tier" value="sekunder"><i></i><span><b>Sekunder</b><small>Tidak wajib, tapi membantu: bensin, pulsa</small></span></label>
       <label class="opt tersier"><input type="radio" name="tier" value="tersier"><i></i><span><b>Tersier</b><small>Gaya hidup: nongkrong, hiburan, belanja</small></span></label>
     </fieldset>
@@ -79,6 +87,7 @@
     <button class="primary" id="save">Simpan</button>
   </form>
 
+  <script src="voice.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

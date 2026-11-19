@@ -1,6 +1,6 @@
 // ===== Data (localStorage) =====
 // tx: { id, type: 'in'|'out', amount, cat, date: 'YYYY-MM-DD', note }
-// Pengeluaran: cat = 'primer' | 'sekunder' | 'tersier'. Pemasukan: cat = nama kategori.
+// Pengeluaran: cat = 'primer' | 'sekunder' | 'tersier' | '' (belum dipilih). Pemasukan: cat = nama kategori.
 const KEY = 'money-record';
 const db = JSON.parse(localStorage.getItem(KEY) || 'null') || {
   tx: [],
@@ -8,7 +8,9 @@ const db = JSON.parse(localStorage.getItem(KEY) || 'null') || {
 };
 const persist = () => localStorage.setItem(KEY, JSON.stringify(db));
 
+// Urutan = urutan menara dari atas ke bawah (primer sebagai pondasi)
 const TIERS = {
+  lain: { name: 'Tanpa tingkat', desc: 'Belum dipilih', color: '#9AA5A1' },
   tersier: { name: 'Tersier', desc: 'Gaya hidup', color: 'var(--tersier)' },
   sekunder: { name: 'Sekunder', desc: 'Membantu, tidak wajib', color: 'var(--sekunder)' },
   primer: { name: 'Primer', desc: 'Wajib tiap bulan', color: 'var(--primer)' },
@@ -34,9 +36,9 @@ function render() {
   const txs = db.tx.filter((t) => t.date.startsWith(ym))
     .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
   const sumIn = txs.filter((t) => t.type === 'in').reduce((s, t) => s + t.amount, 0);
-  const byTier = { tersier: 0, sekunder: 0, primer: 0 };
-  txs.filter((t) => t.type === 'out').forEach((t) => (byTier[t.cat] += t.amount));
-  const sumOut = byTier.tersier + byTier.sekunder + byTier.primer;
+  const byTier = { lain: 0, tersier: 0, sekunder: 0, primer: 0 };
+  txs.filter((t) => t.type === 'out').forEach((t) => (byTier[t.cat || 'lain'] += t.amount));
+  const sumOut = byTier.lain + byTier.tersier + byTier.sekunder + byTier.primer;
 
   $('#balance').textContent = (sumIn - sumOut < 0 ? '−' : '') + rp(Math.abs(sumIn - sumOut));
   $('#balance').classList.toggle('neg', sumIn - sumOut < 0);
@@ -48,7 +50,7 @@ function render() {
   tower.classList.toggle('empty', !sumOut);
   tower.innerHTML = Object.entries(byTier).filter(([, v]) => v)
     .map(([k, v]) => `<i style="flex:${v};background:${TIERS[k].color}"></i>`).join('');
-  $('#legend').innerHTML = Object.entries(byTier).map(([k, v]) => `
+  $('#legend').innerHTML = Object.entries(byTier).filter(([k, v]) => k !== 'lain' || v).map(([k, v]) => `
     <li><b>${TIERS[k].name}</b><b>${rp(v)}</b>
     <small>${TIERS[k].desc}</small><small class="pct" style="color:${TIERS[k].color}">${sumOut ? Math.round((v / sumOut) * 100) : 0}%</small></li>`).join('');
 
@@ -61,8 +63,9 @@ function render() {
   for (const t of txs) {
     if (t.date !== last) { html += `<h2>${dayLabel(t.date)}</h2>`; last = t.date; }
     const out = t.type === 'out';
-    const cat = out ? TIERS[t.cat].name : t.cat;
-    html += `<button class="row" data-id="${t.id}" style="--c:${out ? TIERS[t.cat].color : 'var(--in)'}">
+    const tier = TIERS[t.cat || 'lain'];
+    const cat = out ? tier.name : t.cat;
+    html += `<button class="row" data-id="${t.id}" style="--c:${out ? tier.color : 'var(--in)'}">
       <span><b>${esc(t.note || cat)}</b><small>${esc(cat)}</small></span>
       <b class="amt ${out ? '' : 'in'}">${out ? '−' : '+'}${rp(t.amount)}</b></button>`;
   }
@@ -101,6 +104,47 @@ $('#home').addEventListener('touchend', (e) => {
   if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) shift(dx < 0 ? 1 : -1);
 }, { passive: true });
 $('#addBtn').onclick = () => openForm();
+
+// ===== Catat dengan suara (Web Speech API; teks dibaca oleh voice.js) =====
+const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+const EXAMPLE = '<b>“pengeluaran 50 ribu, hari ini, beli galon”</b>';
+let rec = null;
+
+function voiceHint(html) {
+  $('#voiceHint').hidden = !html;
+  $('#voiceHint').innerHTML = html || '';
+}
+
+if (Speech) {
+  $('#micBtn').hidden = false;
+  $('#micBtn').onclick = () => {
+    if (rec) { rec.stop(); return; }
+    rec = new Speech();
+    rec.lang = 'id-ID';
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+    let heard = '';
+    rec.onresult = (e) => { heard = e.results[0][0].transcript; };
+    rec.onerror = (e) => {
+      heard = '';
+      voiceHint({
+        'not-allowed': 'Izin mikrofon ditolak. Izinkan mikrofon untuk situs ini di pengaturan browser.',
+        'no-speech': 'Tidak ada suara terdengar. Ketuk mikrofon dan coba lagi.',
+        network: 'Pengenal suara butuh koneksi internet.',
+      }[e.error] || 'Suara tidak bisa dikenali. Coba lagi.');
+    };
+    rec.onend = () => {
+      rec = null;
+      $('#micBtn').classList.remove('on');
+      if (!heard) return;
+      voiceHint('');
+      openForm(parseSpeech(heard, db.incomeCats), heard);
+    };
+    rec.start();
+    $('#micBtn').classList.add('on');
+    voiceHint('Mendengarkan… Contoh: ' + EXAMPLE);
+  };
+}
 $('#list').onclick = (e) => { const r = e.target.closest('.row'); if (r) openForm(db.tx.find((t) => t.id === +r.dataset.id)); };
 
 // ===== Form =====
@@ -120,23 +164,37 @@ function setType(type) {
   amountInput.classList.toggle('in', type === 'in');
 }
 
-function openForm(t) {
-  editing = t ? t.id : null;
+// t: transaksi tersimpan (punya id) untuk diubah, atau draf (tanpa id) untuk mengisi form baru, mis. dari suara
+function openForm(t, heard) {
+  editing = t && t.id ? t.id : null;
   form.reset();
-  $('#formTitle').textContent = t ? 'Ubah transaksi' : 'Catat transaksi';
-  $('#save').textContent = t ? 'Simpan perubahan' : 'Simpan';
-  $('#del').hidden = !t;
+  voiceHint('');
+  $('#formTitle').textContent = editing ? 'Ubah transaksi' : 'Catat transaksi';
+  $('#save').textContent = editing ? 'Simpan perubahan' : 'Simpan';
+  $('#del').hidden = !editing;
+  $('#heard').hidden = !heard;
+  $('#heard').textContent = heard ? `Terdengar: “${heard}”` : '';
   setType(t ? t.type : 'out');
   renderChips(t && t.type === 'in' ? t.cat : db.incomeCats[0]);
-  if (t && t.type === 'out') form.tier.value = t.cat;
-  amountInput.value = t ? rp(t.amount) : '';
-  $('#date').value = t ? t.date : iso(new Date());
-  $('#note').value = t ? t.note : '';
+  if (t && t.type === 'out' && t.cat) form.tier.value = t.cat;
+  amountInput.value = t && t.amount ? rp(t.amount) : '';
+  $('#date').value = t && t.date ? t.date : iso(new Date());
+  $('#note').value = t ? t.note || '' : '';
   $('#home').hidden = true;
   form.hidden = false;
   window.scrollTo(0, 0);
-  if (!t) amountInput.focus();
+  if (!editing && !amountInput.value) amountInput.focus();
 }
+
+// Tingkat pengeluaran opsional: ketuk pilihan yang sudah terpilih untuk membatalkannya
+let tierWasChecked = false;
+$('#outCats').addEventListener('pointerdown', (e) => {
+  const input = e.target.closest('.opt')?.querySelector('input');
+  tierWasChecked = !!input && input.checked;
+});
+$('#outCats').addEventListener('click', (e) => {
+  if (e.target.name === 'tier' && tierWasChecked) { e.target.checked = false; tierWasChecked = false; }
+});
 
 function closeForm() {
   form.hidden = true;

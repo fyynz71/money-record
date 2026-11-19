@@ -9,13 +9,42 @@ Aplikasi sederhana untuk mencatat pemasukan dan pengeluaran bulanan. Ringan, tan
 ## Fitur
 
 - **Pemasukan per kategori**: Gaji, Hadiah, Bonus, Jualan, Lainnya, dan kategori buatan sendiri.
-- **Pengeluaran dibagi tiga tingkat kebutuhan:**
+- **Pengeluaran bisa diberi tingkat kebutuhan (opsional):**
   - **Primer**: wajib dan rutin tiap bulan (kos, listrik, makan)
   - **Sekunder**: tidak wajib, tapi membantu (bensin, pulsa)
   - **Tersier**: gaya hidup (nongkrong, hiburan, belanja)
 - Ringkasan per bulan: sisa uang, total masuk dan keluar, serta porsi tiap tingkat pengeluaran.
 - Tambah, ubah, dan hapus transaksi.
+- **Catat dengan suara** (eksperimen): ketuk tombol mikrofon, ucapkan transaksinya, lalu cek dan simpan.
+- Pindah bulan dari bagian bawah layar: tombol ‹ ›, ketuk nama bulan untuk memilih bulan/tahun, atau geser layar.
 - Bisa dipasang ke layar utama HP dan dibuka tanpa internet.
+
+## Catat dengan suara
+
+Contoh kalimat:
+
+- "pengeluaran 50 ribu, hari ini, beli galon"
+- "pemasukan 1 juta, kemarin, gaji"
+- "pengeluaran 100 ribu, tersier, hari ini jajan"
+
+Yang dikenali:
+
+| Bagian | Contoh |
+| --- | --- |
+| Jenis | pemasukan, pengeluaran (tanpa kata ini dianggap pengeluaran) |
+| Jumlah | 50 ribu, 25rb, 1,5 juta, Rp50.000, lima puluh ribu |
+| Tingkat | primer, sekunder, tersier (opsional) |
+| Kategori pemasukan | nama kategori, mis. gaji, hadiah (tidak disebut → Lainnya) |
+| Tanggal | hari ini, kemarin, kemarin lusa, tanggal 18, 18 november |
+| Catatan | sisa kata yang tidak termasuk di atas |
+
+Hasilnya hanya mengisi formulir; transaksi baru tersimpan setelah tombol Simpan ditekan.
+
+Batasan:
+
+- Butuh internet dan izin mikrofon. Suara diproses oleh layanan pengenal suara bawaan browser (Google di Chrome, Apple di Safari).
+- Didukung Chrome Android. Safari iPhone mungkin tidak jalan saat dibuka dari layar utama. Firefox tidak didukung (tombol mikrofon tidak muncul).
+- Pembacaan berbasis aturan, jadi kalimat yang terlalu bebas bisa salah terbaca.
 
 ## Cara pasang di HP
 
@@ -46,6 +75,7 @@ Lalu buka http://localhost:5173.
 | `index.html` | Tampilan Beranda dan formulir transaksi |
 | `style.css` | Gaya tampilan |
 | `app.js` | Logika pencatatan dan ringkasan |
+| `voice.js` | Pembaca kalimat suara menjadi isian transaksi |
 | `sw.js` | Service worker agar bisa dipakai tanpa internet |
 | `manifest.json`, `icon.svg` | Pengaturan agar bisa dipasang di HP |
 | `money-record.figcraft`, `preview.png` | File desain dan pratinjau tampilan |
