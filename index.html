@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F2F4F1">
+  <title>Catatan Uang</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Beranda -->
+  <main id="home">
+    <header class="month">
+      <button id="prev" aria-label="Bulan sebelumnya">‹</button>
+      <h1 id="monthLabel"></h1>
+      <button id="next" aria-label="Bulan berikutnya">›</button>
+    </header>
+
+    <section class="balance">
+      <p class="muted">Sisa bulan ini</p>
+      <p id="balance" class="big"></p>
+      <p class="io"><span class="in">Masuk <b id="sumIn"></b></span><span>Keluar <b id="sumOut"></b></span></p>
+    </section>
+
+    <section class="card tiers">
+      <div class="tower" id="tower"></div>
+      <ul class="legend" id="legend"></ul>
+    </section>
+
+    <section id="list" class="list"></section>
+
+    <button class="primary" id="addBtn">Catat transaksi</button>
+  </main>
+
+  <!-- Form tambah / ubah -->
+  <form id="form" hidden>
+    <header class="bar">
+      <button type="button" id="cancel" class="link">Batal</button>
+      <h1 id="formTitle">Catat transaksi</h1>
+      <span class="spacer"></span>
+    </header>
+
+    <div class="seg" role="radiogroup">
+      <label><input type="radio" name="type" value="out" checked><span>Pengeluaran</span></label>
+      <label><input type="radio" name="type" value="in"><span>Pemasukan</span></label>
+    </div>
+
+    <label class="amount">
+      <span class="muted">Jumlah</span>
+      <input id="amount" inputmode="numeric" autocomplete="off" placeholder="Rp0" required>
+    </label>
+
+    <fieldset id="outCats" class="options">
+      <legend class="muted">Termasuk kebutuhan apa?</legend>
+      <label class="opt primer"><input type="radio" name="tier" value="primer" checked><i></i><span><b>Primer</b><small>Wajib dan rutin tiap bulan: kos, listrik, makan</small></span></label>
+      <label class="opt sekunder"><input type="radio" name="tier" value="sekunder"><i></i><span><b>Sekunder</b><small>Tidak wajib, tapi membantu: bensin, pulsa</small></span></label>
+      <label class="opt tersier"><input type="radio" name="tier" value="tersier"><i></i><span><b>Tersier</b><small>Gaya hidup: nongkrong, hiburan, belanja</small></span></label>
+    </fieldset>
+
+    <fieldset id="inCats" class="chips" hidden>
+      <legend class="muted">Dari mana?</legend>
+      <div id="chips"></div>
+    </fieldset>
+
+    <div class="card fields">
+      <label><span class="muted">Tanggal</span><input type="date" id="date" required></label>
+      <label><span class="muted">Catatan</span><input id="note" placeholder="Opsional" maxlength="60"></label>
+    </div>
+
+    <button type="button" id="del" class="danger" hidden>Hapus transaksi</button>
+    <button class="primary" id="save">Simpan</button>
+  </form>
+
+  <script src="app.js"></script>
+</body>
+</html>
