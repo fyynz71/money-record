@@ -15,14 +15,8 @@
 <body>
   <!-- Beranda -->
   <main id="home">
-    <header class="month">
-      <button id="prev" aria-label="Bulan sebelumnya">‹</button>
-      <h1 id="monthLabel"></h1>
-      <button id="next" aria-label="Bulan berikutnya">›</button>
-    </header>
-
     <section class="balance">
-      <p class="muted">Sisa bulan ini</p>
+      <p class="muted" id="balanceLabel"></p>
       <p id="balance" class="big"></p>
       <p class="io"><span class="in">Masuk <b id="sumIn"></b></span><span>Keluar <b id="sumOut"></b></span></p>
     </section>
@@ -34,7 +28,16 @@
 
     <section id="list" class="list"></section>
 
-    <button class="primary" id="addBtn">Catat transaksi</button>
+    <!-- Navigasi bulan di bawah agar mudah dijangkau jempol -->
+    <div class="dock">
+      <nav class="month">
+        <button id="prev" aria-label="Bulan sebelumnya">‹</button>
+        <button id="monthLabel" aria-label="Pilih bulan dan tahun"></button>
+        <input type="month" id="monthPick" tabindex="-1" aria-hidden="true">
+        <button id="next" aria-label="Bulan berikutnya">›</button>
+      </nav>
+      <button class="primary" id="addBtn">Catat transaksi</button>
+    </div>
   </main>
 
   <!-- Form tambah / ubah -->

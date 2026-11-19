@@ -37,9 +37,21 @@ main, form {
 .card { background: #fff; border-radius: 22px; }
 
 /* Beranda */
-.month { display: flex; justify-content: space-between; align-items: center; }
-.month h1, .bar h1 { font-size: 17px; font-weight: 700; }
-.month button { font-size: 28px; font-weight: 700; color: var(--muted); width: 40px; height: 40px; }
+#home { padding-bottom: 176px; }
+.bar h1 { font-size: 17px; font-weight: 700; }
+
+.dock {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 28px 20px max(24px, env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, var(--paper) 28px);
+}
+.month { display: flex; align-items: center; gap: 8px; position: relative; }
+.month button { height: 48px; border-radius: 24px; font-weight: 700; }
+#prev, #next { width: 48px; font-size: 28px; color: var(--muted); background: var(--seg); }
+#monthLabel { min-width: 180px; padding: 0 20px; font-size: 16px; background: #fff; }
+#monthPick { position: absolute; left: 50%; bottom: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 
 .big { font-size: 40px; font-weight: 800; letter-spacing: -1px; line-height: 1.15; }
 .big.neg { color: var(--danger); }
@@ -85,6 +97,7 @@ main, form {
   font-weight: 700;
   box-shadow: 0 8px 20px #1E2A2A33;
 }
+.dock .primary { position: static; transform: none; width: min(350px, 100%); }
 
 /* Form */
 .bar { display: flex; justify-content: space-between; align-items: center; }

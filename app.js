@@ -26,7 +26,10 @@ let editing = null; // id transaksi yang sedang diubah
 // ===== Beranda =====
 function render() {
   const ym = iso(month).slice(0, 7);
-  $('#monthLabel').textContent = month.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  const label = month.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+  $('#monthLabel').textContent = label;
+  $('#monthPick').value = ym;
+  $('#balanceLabel').textContent = ym === iso(new Date()).slice(0, 7) ? 'Sisa bulan ini' : 'Sisa ' + label;
 
   const txs = db.tx.filter((t) => t.date.startsWith(ym))
     .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
@@ -73,8 +76,30 @@ function dayLabel(date) {
   return new Date(date + 'T00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
-$('#prev').onclick = () => { month.setMonth(month.getMonth() - 1); render(); };
-$('#next').onclick = () => { month.setMonth(month.getMonth() + 1); render(); };
+const shift = (n) => { month.setMonth(month.getMonth() + n); render(); };
+$('#prev').onclick = () => shift(-1);
+$('#next').onclick = () => shift(1);
+
+// Ketuk label bulan → pemilih bulan & tahun bawaan HP
+$('#monthLabel').onclick = () => {
+  try { $('#monthPick').showPicker(); } catch { $('#monthPick').focus(); }
+};
+$('#monthPick').onchange = (e) => {
+  if (!e.target.value) return;
+  month = new Date(e.target.value + '-01T00:00');
+  render();
+};
+
+// Geser layar kiri/kanan untuk pindah bulan
+let touch = null;
+$('#home').addEventListener('touchstart', (e) => { touch = e.touches[0]; }, { passive: true });
+$('#home').addEventListener('touchend', (e) => {
+  if (!touch) return;
+  const dx = e.changedTouches[0].clientX - touch.clientX;
+  const dy = e.changedTouches[0].clientY - touch.clientY;
+  touch = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) shift(dx < 0 ? 1 : -1);
+}, { passive: true });
 $('#addBtn').onclick = () => openForm();
 $('#list').onclick = (e) => { const r = e.target.closest('.row'); if (r) openForm(db.tx.find((t) => t.id === +r.dataset.id)); };
 

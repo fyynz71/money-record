@@ -1,5 +1,5 @@
 // Cache-first agar aplikasi tetap jalan offline. Naikkan versi saat file berubah.
-const CACHE = 'money-record-v1';
+const CACHE = 'money-record-v2';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.json', 'icon.svg'];
 
 self.addEventListener('install', (e) => {
