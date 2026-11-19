@@ -36,13 +36,7 @@
         <input type="month" id="monthPick" tabindex="-1" aria-hidden="true">
         <button id="next" aria-label="Bulan berikutnya">›</button>
       </nav>
-      <p id="voiceHint" class="voice-hint" role="status" hidden></p>
-      <div class="actions">
-        <button class="primary" id="addBtn">Catat transaksi</button>
-        <button class="mic" id="micBtn" aria-label="Catat dengan suara" hidden>
-          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15Zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.6a6 6 0 0 0 5-5.9Z"/></svg>
-        </button>
-      </div>
+      <button class="primary" id="addBtn">Catat transaksi</button>
     </div>
   </main>
 
@@ -53,8 +47,6 @@
       <h1 id="formTitle">Catat transaksi</h1>
       <span class="spacer"></span>
     </header>
-
-    <p id="heard" class="heard" hidden></p>
 
     <div class="seg" role="radiogroup">
       <label><input type="radio" name="type" value="out" checked><span>Pengeluaran</span></label>
@@ -87,7 +79,6 @@
     <button class="primary" id="save">Simpan</button>
   </form>
 
-  <script src="voice.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -97,24 +97,7 @@ main, form {
   font-weight: 700;
   box-shadow: 0 8px 20px #1E2A2A33;
 }
-.dock .primary { position: static; transform: none; width: auto; flex: 1; }
-.actions { display: flex; gap: 10px; width: min(350px, 100%); }
-.mic {
-  width: 56px; height: 56px; border-radius: 28px; flex-shrink: 0;
-  display: grid; place-items: center;
-  background: #fff; color: var(--ink);
-  box-shadow: 0 8px 20px #1E2A2A1F;
-}
-.mic.on { background: var(--danger); color: #fff; animation: pulse 1.2s ease-in-out infinite; }
-@keyframes pulse { 50% { box-shadow: 0 0 0 10px #B3402F33; } }
-@media (prefers-reduced-motion: reduce) { .mic.on { animation: none; } }
-.voice-hint {
-  width: min(350px, 100%);
-  background: #fff; border-radius: 16px; padding: 12px 16px;
-  font-size: 14px; color: var(--muted);
-}
-.voice-hint b { color: var(--ink); }
-.heard { background: #fff; border-radius: 14px; padding: 10px 14px; font-size: 14px; color: var(--muted); margin-bottom: -8px; }
+.dock .primary { position: static; transform: none; width: min(350px, 100%); }
 
 /* Form */
 .bar { display: flex; justify-content: space-between; align-items: center; }

@@ -105,46 +105,6 @@ $('#home').addEventListener('touchend', (e) => {
 }, { passive: true });
 $('#addBtn').onclick = () => openForm();
 
-// ===== Catat dengan suara (Web Speech API; teks dibaca oleh voice.js) =====
-const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-const EXAMPLE = '<b>“pengeluaran 50 ribu, hari ini, beli galon”</b>';
-let rec = null;
-
-function voiceHint(html) {
-  $('#voiceHint').hidden = !html;
-  $('#voiceHint').innerHTML = html || '';
-}
-
-if (Speech) {
-  $('#micBtn').hidden = false;
-  $('#micBtn').onclick = () => {
-    if (rec) { rec.stop(); return; }
-    rec = new Speech();
-    rec.lang = 'id-ID';
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    let heard = '';
-    rec.onresult = (e) => { heard = e.results[0][0].transcript; };
-    rec.onerror = (e) => {
-      heard = '';
-      voiceHint({
-        'not-allowed': 'Izin mikrofon ditolak. Izinkan mikrofon untuk situs ini di pengaturan browser.',
-        'no-speech': 'Tidak ada suara terdengar. Ketuk mikrofon dan coba lagi.',
-        network: 'Pengenal suara butuh koneksi internet.',
-      }[e.error] || 'Suara tidak bisa dikenali. Coba lagi.');
-    };
-    rec.onend = () => {
-      rec = null;
-      $('#micBtn').classList.remove('on');
-      if (!heard) return;
-      voiceHint('');
-      openForm(parseSpeech(heard, db.incomeCats), heard);
-    };
-    rec.start();
-    $('#micBtn').classList.add('on');
-    voiceHint('Mendengarkan… Contoh: ' + EXAMPLE);
-  };
-}
 $('#list').onclick = (e) => { const r = e.target.closest('.row'); if (r) openForm(db.tx.find((t) => t.id === +r.dataset.id)); };
 
 // ===== Form =====
@@ -164,26 +124,22 @@ function setType(type) {
   amountInput.classList.toggle('in', type === 'in');
 }
 
-// t: transaksi tersimpan (punya id) untuk diubah, atau draf (tanpa id) untuk mengisi form baru, mis. dari suara
-function openForm(t, heard) {
-  editing = t && t.id ? t.id : null;
+function openForm(t) {
+  editing = t ? t.id : null;
   form.reset();
-  voiceHint('');
-  $('#formTitle').textContent = editing ? 'Ubah transaksi' : 'Catat transaksi';
-  $('#save').textContent = editing ? 'Simpan perubahan' : 'Simpan';
-  $('#del').hidden = !editing;
-  $('#heard').hidden = !heard;
-  $('#heard').textContent = heard ? `Terdengar: “${heard}”` : '';
+  $('#formTitle').textContent = t ? 'Ubah transaksi' : 'Catat transaksi';
+  $('#save').textContent = t ? 'Simpan perubahan' : 'Simpan';
+  $('#del').hidden = !t;
   setType(t ? t.type : 'out');
   renderChips(t && t.type === 'in' ? t.cat : db.incomeCats[0]);
   if (t && t.type === 'out' && t.cat) form.tier.value = t.cat;
-  amountInput.value = t && t.amount ? rp(t.amount) : '';
-  $('#date').value = t && t.date ? t.date : iso(new Date());
-  $('#note').value = t ? t.note || '' : '';
+  amountInput.value = t ? rp(t.amount) : '';
+  $('#date').value = t ? t.date : iso(new Date());
+  $('#note').value = t ? t.note : '';
   $('#home').hidden = true;
   form.hidden = false;
   window.scrollTo(0, 0);
-  if (!editing && !amountInput.value) amountInput.focus();
+  if (!t) amountInput.focus();
 }
 
 // Tingkat pengeluaran opsional: ketuk pilihan yang sudah terpilih untuk membatalkannya
